@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as InvestRouteImport } from './routes/invest'
+import { Route as FantasyRouteImport } from './routes/fantasy'
 import { Route as BankRouteImport } from './routes/bank'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -22,6 +23,11 @@ const PortfolioRoute = PortfolioRouteImport.update({
 const InvestRoute = InvestRouteImport.update({
   id: '/invest',
   path: '/invest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FantasyRoute = FantasyRouteImport.update({
+  id: '/fantasy',
+  path: '/fantasy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BankRoute = BankRouteImport.update({
@@ -38,12 +44,14 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bank': typeof BankRoute
+  '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/portfolio': typeof PortfolioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bank': typeof BankRoute
+  '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/portfolio': typeof PortfolioRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bank': typeof BankRoute
+  '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/portfolio': typeof PortfolioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/bank' | '/invest' | '/portfolio'
+  fullPaths: '/' | '/bank' | '/fantasy' | '/invest' | '/portfolio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/bank' | '/invest' | '/portfolio'
-  id: '__root__' | '/' | '/bank' | '/invest' | '/portfolio'
+  to: '/' | '/bank' | '/fantasy' | '/invest' | '/portfolio'
+  id: '__root__' | '/' | '/bank' | '/fantasy' | '/invest' | '/portfolio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BankRoute: typeof BankRoute
+  FantasyRoute: typeof FantasyRoute
   InvestRoute: typeof InvestRoute
   PortfolioRoute: typeof PortfolioRoute
 }
@@ -83,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/invest'
       fullPath: '/invest'
       preLoaderRoute: typeof InvestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fantasy': {
+      id: '/fantasy'
+      path: '/fantasy'
+      fullPath: '/fantasy'
+      preLoaderRoute: typeof FantasyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bank': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BankRoute: BankRoute,
+  FantasyRoute: FantasyRoute,
   InvestRoute: InvestRoute,
   PortfolioRoute: PortfolioRoute,
 }
