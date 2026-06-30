@@ -15,6 +15,7 @@ import { Route as NewsRouteImport } from './routes/news'
 import { Route as MarketsRouteImport } from './routes/markets'
 import { Route as InvestRouteImport } from './routes/invest'
 import { Route as FantasyRouteImport } from './routes/fantasy'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BankRouteImport } from './routes/bank'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -48,6 +49,11 @@ const FantasyRoute = FantasyRouteImport.update({
   path: '/fantasy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BankRoute = BankRouteImport.update({
   id: '/bank',
   path: '/bank',
@@ -62,6 +68,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bank': typeof BankRoute
+  '/blog': typeof BlogRoute
   '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/markets': typeof MarketsRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bank': typeof BankRoute
+  '/blog': typeof BlogRoute
   '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/markets': typeof MarketsRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bank': typeof BankRoute
+  '/blog': typeof BlogRoute
   '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/markets': typeof MarketsRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/bank'
+    | '/blog'
     | '/fantasy'
     | '/invest'
     | '/markets'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/bank'
+    | '/blog'
     | '/fantasy'
     | '/invest'
     | '/markets'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/bank'
+    | '/blog'
     | '/fantasy'
     | '/invest'
     | '/markets'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BankRoute: typeof BankRoute
+  BlogRoute: typeof BlogRoute
   FantasyRoute: typeof FantasyRoute
   InvestRoute: typeof InvestRoute
   MarketsRoute: typeof MarketsRoute
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FantasyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bank': {
       id: '/bank'
       path: '/bank'
@@ -198,6 +218,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BankRoute: BankRoute,
+  BlogRoute: BlogRoute,
   FantasyRoute: FantasyRoute,
   InvestRoute: InvestRoute,
   MarketsRoute: MarketsRoute,
