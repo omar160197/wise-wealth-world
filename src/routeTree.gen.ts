@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ScreenersRouteImport } from './routes/screeners'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as MarketsRouteImport } from './routes/markets'
@@ -17,6 +18,11 @@ import { Route as FantasyRouteImport } from './routes/fantasy'
 import { Route as BankRouteImport } from './routes/bank'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ScreenersRoute = ScreenersRouteImport.update({
+  id: '/screeners',
+  path: '/screeners',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/markets': typeof MarketsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
+  '/screeners': typeof ScreenersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/markets': typeof MarketsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
+  '/screeners': typeof ScreenersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/markets': typeof MarketsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
+  '/screeners': typeof ScreenersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/markets'
     | '/news'
     | '/portfolio'
+    | '/screeners'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/markets'
     | '/news'
     | '/portfolio'
+    | '/screeners'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/markets'
     | '/news'
     | '/portfolio'
+    | '/screeners'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,10 +131,18 @@ export interface RootRouteChildren {
   MarketsRoute: typeof MarketsRoute
   NewsRoute: typeof NewsRoute
   PortfolioRoute: typeof PortfolioRoute
+  ScreenersRoute: typeof ScreenersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/screeners': {
+      id: '/screeners'
+      path: '/screeners'
+      fullPath: '/screeners'
+      preLoaderRoute: typeof ScreenersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portfolio': {
       id: '/portfolio'
       path: '/portfolio'
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketsRoute: MarketsRoute,
   NewsRoute: NewsRoute,
   PortfolioRoute: PortfolioRoute,
+  ScreenersRoute: ScreenersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
