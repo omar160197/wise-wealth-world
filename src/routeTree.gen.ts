@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as NewsRouteImport } from './routes/news'
 import { Route as MarketsRouteImport } from './routes/markets'
 import { Route as InvestRouteImport } from './routes/invest'
 import { Route as FantasyRouteImport } from './routes/fantasy'
@@ -19,6 +20,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketsRoute = MarketsRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/markets': typeof MarketsRoute
+  '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/markets': typeof MarketsRoute
+  '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
 }
 export interface FileRoutesById {
@@ -70,13 +78,28 @@ export interface FileRoutesById {
   '/fantasy': typeof FantasyRoute
   '/invest': typeof InvestRoute
   '/markets': typeof MarketsRoute
+  '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/bank' | '/fantasy' | '/invest' | '/markets' | '/portfolio'
+  fullPaths:
+    | '/'
+    | '/bank'
+    | '/fantasy'
+    | '/invest'
+    | '/markets'
+    | '/news'
+    | '/portfolio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/bank' | '/fantasy' | '/invest' | '/markets' | '/portfolio'
+  to:
+    | '/'
+    | '/bank'
+    | '/fantasy'
+    | '/invest'
+    | '/markets'
+    | '/news'
+    | '/portfolio'
   id:
     | '__root__'
     | '/'
@@ -84,6 +107,7 @@ export interface FileRouteTypes {
     | '/fantasy'
     | '/invest'
     | '/markets'
+    | '/news'
     | '/portfolio'
   fileRoutesById: FileRoutesById
 }
@@ -93,6 +117,7 @@ export interface RootRouteChildren {
   FantasyRoute: typeof FantasyRoute
   InvestRoute: typeof InvestRoute
   MarketsRoute: typeof MarketsRoute
+  NewsRoute: typeof NewsRoute
   PortfolioRoute: typeof PortfolioRoute
 }
 
@@ -103,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/portfolio'
       fullPath: '/portfolio'
       preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/markets': {
@@ -149,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   FantasyRoute: FantasyRoute,
   InvestRoute: InvestRoute,
   MarketsRoute: MarketsRoute,
+  NewsRoute: NewsRoute,
   PortfolioRoute: PortfolioRoute,
 }
 export const routeTree = rootRouteImport
