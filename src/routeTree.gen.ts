@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ScreenersRouteImport } from './routes/screeners'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as MarketsRouteImport } from './routes/markets'
@@ -22,6 +23,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const ScreenersRoute = ScreenersRouteImport.update({
   id: '/screeners',
   path: '/screeners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioRoute = PortfolioRouteImport.update({
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/markets': typeof MarketsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
+  '/profile': typeof ProfileRoute
   '/screeners': typeof ScreenersRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/markets': typeof MarketsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
+  '/profile': typeof ProfileRoute
   '/screeners': typeof ScreenersRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/markets': typeof MarketsRoute
   '/news': typeof NewsRoute
   '/portfolio': typeof PortfolioRoute
+  '/profile': typeof ProfileRoute
   '/screeners': typeof ScreenersRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/markets'
     | '/news'
     | '/portfolio'
+    | '/profile'
     | '/screeners'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/markets'
     | '/news'
     | '/portfolio'
+    | '/profile'
     | '/screeners'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/markets'
     | '/news'
     | '/portfolio'
+    | '/profile'
     | '/screeners'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   MarketsRoute: typeof MarketsRoute
   NewsRoute: typeof NewsRoute
   PortfolioRoute: typeof PortfolioRoute
+  ProfileRoute: typeof ProfileRoute
   ScreenersRoute: typeof ScreenersRoute
 }
 
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/screeners'
       fullPath: '/screeners'
       preLoaderRoute: typeof ScreenersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio': {
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketsRoute: MarketsRoute,
   NewsRoute: NewsRoute,
   PortfolioRoute: PortfolioRoute,
+  ProfileRoute: ProfileRoute,
   ScreenersRoute: ScreenersRoute,
 }
 export const routeTree = rootRouteImport
