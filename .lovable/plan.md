@@ -1,65 +1,87 @@
 
-## Goal
+## Vision reset
 
-Rebuild the InvestWhat app as a **mobile-first** experience that keeps the spirit of Sarah's mockup (clean, calm, generous spacing, AI-forward) while applying the CEO's structural feedback. Desktop will be a graceful scaled-up version, but all design decisions start at mobile width.
+Today's homepage is built for **existing** users — dense with dashboards, P/L, portfolios, tickers, trending. The new brief: the homepage is for a **brand-new guest** who has no context on investing, portfolios, or what this platform even does. Think "your younger brother opens the app cold."
 
-## Information architecture
+Goals for the new homepage:
+- Single viewport, **no vertical scroll** on desktop and mobile (content fits inside the shell, above the AI dock).
+- Show the *power* of the platform in the first 3 seconds through motion + one clear question, not stats.
+- Guide the user through a short **conversational discovery** ("Do you have accounts? Do you know what a portfolio is? Want us to build one with AI?").
+- Compress the rest of the current homepage into other pages / the hamburger menu — nothing is deleted, just moved.
 
-**Bottom tab bar (5 icons, always visible on mobile):**
-1. **Home** — dashboard: greeting, daily P/L highlight, market snapshot, "Investing style check-up", quick AI prompt entry, highlights/reports feed
-2. **Bank** (Personal Finance) — connect bank/credit cards via open banking or upload statements; cashflow + spending highlights (mock)
-3. **Portfolio** — real holdings (broker connect / statement upload); allocation, performance, AI rebalancing suggestions, alerts
-4. **Invest** — browse portfolios, stocks, funds; fact sheets and in-house AI analytics; "Build with AI" entry
-5. **Fantasy** — user-created custom portfolios, forward-testing results, fantasy leaderboard
+## New homepage layout (fits one screen)
 
-**Top bar (mobile):**
-- Hamburger (left) → drawer with: Markets, Screeners, Top movers, News, Blog, Notifications, Profile, Settings, Dark mode, Sign out
-- Logo (center) + Search/Bell (right)
+```text
+┌──────────────────────────────────────────────────────────────┐
+│  AI mesh / particle animation background (subtle, always on) │
+│                                                              │
+│  ┌──────────── LEFT (2/3) ───────────┐  ┌── RIGHT (1/3) ──┐  │
+│  │                                   │  │ Top performer   │  │
+│  │  H1: "Investing, explained by AI" │  │  portfolio card │  │
+│  │  Sub: one-line value prop         │  │  (mini spark)   │  │
+│  │                                   │  ├─────────────────┤  │
+│  │  GET STARTED — 3 tiles:           │  │ Savings card    │  │
+│  │   • I'm new to investing          │  │ (progress + AI  │  │
+│  │   • I have accounts, connect them │  │  suggestion)    │  │
+│  │   • Build a portfolio with AI     │  │                 │  │
+│  │                                   │  │                 │  │
+│  │  AI chat dock (enhanced):         │  │                 │  │
+│  │   Prompt input + smart chips that │  │                 │  │
+│  │   adapt to whichever tile is hot  │  │                 │  │
+│  └───────────────────────────────────┘  └─────────────────┘  │
+└──────────────────────────────────────────────────────────────┘
+```
 
-**Floating AI copilot button:**
-- Fixed bottom-right above the tab bar on every page
-- Opens a bottom sheet chat that receives the current page as context (e.g. "Portfolio: Retirement Fund"); pre-filled context chip + suggested prompts that vary per page
+Mobile: same three blocks stack — hero + get-started tiles, right rail collapses to a compact horizontal pair (Top performer / Savings) above the AI dock. Still no page scroll; the AI dock stays pinned.
 
-**Desktop (≥lg):**
-- Collapses bottom tabs into a left sidebar (same 5 items + hamburger items grouped under "More")
-- Three-column home like the reference: nav | content | markets/portfolio rail
+## Guided discovery (the "conversation")
 
-## Home screen (matches reference, enhanced)
+Clicking a Get Started tile does **not** navigate away — it swaps the left column into a small stepper inside the same viewport:
 
-- Greeting strip: "Welcome back, Alex — you're up $1,550 today"
-- 4 action cards (2×2 on mobile): Browse portfolios, Try a fantasy portfolio, Build your own, **Build with AI** (highlighted/primary, glowing accent — the CEO-emphasized prompt)
-- "Your personal AI investment assistant" input + sample prompt chips (horizontal scroll on mobile)
-- "Investing style check-up" card (2-min quiz teaser)
-- Markets snapshot strip (S&P, NASDAQ, DOW, VIX) — horizontal scroll on mobile, right rail on desktop
-- "Your portfolios" preview list with performance pills
-- Trending tickers chips
+1. **"I'm new"** → 2-question mini quiz (timeline, comfort with risk) → CTA "See a starter AI portfolio" (opens AI chat pre-filled).
+2. **"I have accounts"** → connect stubs (Bank / Brokerage) with mocked "Connected ✓" state → CTA "Analyze my holdings" (opens AI chat with context chip).
+3. **"Build with AI"** → prompt-first entry: single big input "Describe your goal in one sentence" → opens AI chat with the goal as first message.
 
-## Visual design enhancements (over the reference)
+Between steps, tiny nudge copy: "Not sure? Ask the AI anything." — keeps the AI as the safety net.
 
-- **Mobile-first spacing**, large tap targets (min 44px), safe-area aware bottom tab bar
-- Refined palette: soft off-white background, deep ink text, **emerald primary** (kept from reference), subtle mint accent surfaces, restrained red for negatives
-- Typography: distinctive display font for numbers/headings (e.g. Geist or Space Grotesk) + clean sans body (Inter) — avoid generic look
-- Card style: soft rounded-2xl, hair-line borders, layered subtle shadows (not flat)
-- Number-forward design: big readable P/L figures, sparkline accents on portfolio cards
-- Subtle motion: tab switch fade, AI button pulse on idle, card hover lift on desktop
-- Full dark mode
+## AI-forward animation
 
-## Technical plan
+Add a lightweight canvas/CSS background: soft flowing gradient mesh + drifting nodes/edges (evokes a neural graph), tuned green/mint on light, deeper teal on dark. Runs at ~30fps, pauses on `prefers-reduced-motion`. No third-party heavy lib — small custom canvas component (~80 lines) so we don't bloat the bundle.
 
-- Stack stays TanStack Start + Tailwind v4 + shadcn (already configured)
-- New routes under `src/routes/`: `index.tsx` (Home, replace placeholder), `bank.tsx`, `portfolio.tsx`, `invest.tsx`, `fantasy.tsx`, plus hamburger pages: `markets.tsx`, `news.tsx`, `screeners.tsx`, `blog.tsx`, `profile.tsx`
-- Layout in `__root.tsx` wraps `<Outlet />` with `<AppShell>` providing: top bar, hamburger Sheet, bottom tab bar, floating AI button + chat sheet
-- Components: `BottomTabBar`, `TopBar`, `HamburgerMenu` (shadcn Sheet), `AiCopilotButton` + `AiChatSheet` (mock responses for now, wired so we can plug Lovable AI later), `MarketTicker`, `PortfolioCard`, `ActionCard`, `PromptChips`
-- All data mocked in `src/lib/mock-data.ts`
-- Design tokens added to `src/styles.css` (semantic colors, new font tokens, shadow + gradient tokens); fonts loaded via `<link>` in `__root.tsx` head
-- No backend / Lovable Cloud needed for this pass
+## What moves off the homepage
 
-## Out of scope (this iteration)
+| Current homepage block | New home for it |
+|---|---|
+| Markets snapshot strip | Already lives on `/markets` (hamburger) — remove from home |
+| "Your portfolios" list | `/portfolio` (already there) |
+| Trending tickers | `/markets` |
+| Investing style check-up card | Becomes the "I'm new" flow inside home |
+| AI input + prompt chips | Stays, but redesigned as the persistent dock |
+| Greeting + daily P/L | Removed for guests; will return later behind auth |
 
-- Real broker / open-banking integrations (placeholders + "Connect" CTAs only)
-- Real AI calls (mocked responses; structure ready for Lovable AI Gateway later)
-- Auth (Alex Morgan shown as static mock profile)
+Nothing is deleted from `mock-data.ts`; the other pages already consume it.
 
-## Open question
+## Files touched
 
-Are you happy for me to use **mocked AI responses + mock financial data** for now, with the structure ready to wire real Lovable AI + broker integrations in a later pass? If you'd rather enable Lovable AI Gateway and Cloud in this pass, I'll add that to the plan.
+- **New:** `src/components/home/AiMeshBackground.tsx` — canvas animation
+- **New:** `src/components/home/GetStartedTiles.tsx` — 3 tiles + stepper state
+- **New:** `src/components/home/TopPerformerCard.tsx`, `SavingsCard.tsx` — right-rail cards
+- **New:** `src/components/home/HomeAiDock.tsx` — enhanced prompt input with context-aware chips
+- **Rewrite:** `src/routes/index.tsx` — thin composition of the above, `h-[calc(100dvh-...)]` layout, `overflow-hidden`
+- **Minor:** `src/lib/mock-data.ts` — add `topPerformer` + `savingsPreview` mock entries
+- **Untouched:** `app-shell`, other routes, portfolio page, styles tokens (reuse existing emerald/mint)
+
+## Out of scope for this pass
+
+- Real auth / real broker connect (mocked "Connected ✓" only)
+- Real AI calls (chat still uses the mock sheet you have)
+- Redesigning the other tabs — you said homepage first
+
+## Open question before I build
+
+The "no scroll ever" constraint is strict on short laptops (e.g. 13" at 1280×720 with the top bar + bottom dock leaves ~500px of usable height). Two options:
+
+- **A. Strict no-scroll:** shrink type/tile sizes so it always fits — safer but visually tighter.
+- **B. Fits-on-standard:** designed to fit 1440×900 and typical phones without scrolling, allows minor scroll on unusually short screens.
+
+I'd recommend **B** — same intent, but doesn't force cramped type on the majority. Want me to go with B, or hold to strict A?
