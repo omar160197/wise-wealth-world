@@ -53,7 +53,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <TopBar />
-      <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-4 lg:pb-10 lg:pl-72">
+      <main className="mx-auto w-full max-w-7xl overflow-hidden px-4 pb-28 pt-4 lg:pb-10 lg:pl-72">
         {children}
       </main>
       <DesktopSidebar pathname={pathname} />
