@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { AiMeshBackground } from "@/components/home/AiMeshBackground";
 import { cn } from "@/lib/utils";
+import { useRole } from "@/lib/role-context";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -46,17 +47,20 @@ function HomePage() {
   const [track, setTrack] = useState<Track>(null);
   const [tab, setTab] = useState<Tab>("how");
   const [showWelcome, setShowWelcome] = useState(false);
+  const { role } = useRole();
 
   return (
     <div className="flex h-[calc(100svh-56px)] flex-col gap-2 overflow-hidden pb-[env(safe-area-inset-bottom)] lg:h-[calc(100svh-56px-40px)]">
       {/* Bento grid — fills the viewport */}
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-[1fr_1fr]">
 
-        {/* ── LEFT COLUMN: hero + start tiles ── */}
+        {/* ── LEFT COLUMN ── */}
         <div className="relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/80 p-4 shadow-soft backdrop-blur-md sm:p-5">
           <AiMeshBackground className="rounded-2xl" />
 
-          {track !== null ? (
+          {role === "experienced" ? (
+            <ExperiencedLeftPanel />
+          ) : track !== null ? (
             /* Track panel overlays the left column */
             <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto">
               <button
@@ -132,15 +136,21 @@ function HomePage() {
           {/* Tab bar */}
           <div className="flex shrink-0 gap-1 border-b border-border/60 px-3 pt-2.5">
             {(
-              [
-                { id: "how", label: "How it works" },
-                { id: "features", label: "Features" },
-                { id: "ask", label: "Ask AI" },
-              ] as { id: Tab; label: string }[]
+              role === "experienced"
+                ? [
+                    { id: "how", label: "Market Pulse" },
+                    { id: "features", label: "Quick Actions" },
+                    { id: "ask", label: "Ask AI" },
+                  ]
+                : [
+                    { id: "how", label: "How it works" },
+                    { id: "features", label: "Features" },
+                    { id: "ask", label: "Ask AI" },
+                  ]
             ).map((t) => (
               <button
                 key={t.id}
-                onClick={() => setTab(t.id)}
+                onClick={() => setTab(t.id as Tab)}
                 className={cn(
                   "rounded-t-xl px-3.5 py-2 text-xs font-semibold transition",
                   tab === t.id
@@ -155,9 +165,19 @@ function HomePage() {
 
           {/* Tab content */}
           <div className="min-h-0 flex-1 overflow-y-auto p-4">
-            {tab === "how" && <HowItWorksPanel />}
-            {tab === "features" && <FeaturesPanel />}
-            {tab === "ask" && <AskAiPanel />}
+            {role === "experienced" ? (
+              <>
+                {tab === "how" && <MarketPulsePanel />}
+                {tab === "features" && <QuickActionsPanel />}
+                {tab === "ask" && <AskAiPanel experienced />}
+              </>
+            ) : (
+              <>
+                {tab === "how" && <HowItWorksPanel />}
+                {tab === "features" && <FeaturesPanel />}
+                {tab === "ask" && <AskAiPanel />}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -178,6 +198,185 @@ function HomePage() {
       </div>
 
       {showWelcome && <WelcomeInterstitial onClose={() => setShowWelcome(false)} />}
+    </div>
+  );
+}
+
+/* ─────────────────────── EXPERIENCED LEFT PANEL ─────────────────────── */
+
+const PORTFOLIO_ROWS = [
+  { ticker: "VOO", name: "Vanguard S&P 500", value: "$12,480", change: "+1.24%", up: true },
+  { ticker: "AAPL", name: "Apple Inc.", value: "$4,320", change: "-0.38%", up: false },
+  { ticker: "BTC", name: "Bitcoin", value: "$3,100", change: "+3.12%", up: true },
+  { ticker: "AGG", name: "US Bond ETF", value: "$2,800", change: "+0.06%", up: true },
+];
+
+function ExperiencedLeftPanel() {
+  return (
+    <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+      {/* Header */}
+      <div>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary-soft/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent-foreground">
+          <BarChart3 className="size-3" /> Pro dashboard
+        </span>
+        <h1 className="font-display mt-2 text-balance text-2xl font-bold leading-[1.1] tracking-tight">
+          Welcome back, <span className="text-primary">Alex.</span>
+        </h1>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Your portfolio is up <span className="font-semibold text-primary">+2.4%</span> this week. Markets are open.
+        </p>
+      </div>
+
+      {/* Portfolio snapshot */}
+      <div className="rounded-xl border border-border/70 bg-background/60">
+        <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Holdings</span>
+          <span className="text-[10px] font-semibold text-primary">$22,700 total</span>
+        </div>
+        <div className="divide-y divide-border/40">
+          {PORTFOLIO_ROWS.map((r) => (
+            <div key={r.ticker} className="flex items-center gap-3 px-3 py-2">
+              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-muted text-[10px] font-bold">
+                {r.ticker.slice(0, 2)}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[11px] font-semibold leading-tight">{r.ticker}</div>
+                <div className="truncate text-[10px] text-muted-foreground">{r.name}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-[11px] font-semibold">{r.value}</div>
+                <div className={cn("text-[10px] font-medium", r.up ? "text-primary" : "text-destructive")}>
+                  {r.change}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mini stat row */}
+      <div className="grid grid-cols-3 gap-2">
+        <MiniStat label="7-day P&L" value="+$542" />
+        <MiniStat label="Sharpe ratio" value="1.42" />
+        <MiniStat label="Risk score" value="6/10" />
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────── MARKET PULSE PANEL (experienced) ─────────────────────── */
+
+const MARKET_MOVERS = [
+  { ticker: "NVDA", change: "+4.8%", up: true, name: "NVIDIA" },
+  { ticker: "MSFT", change: "+1.2%", up: true, name: "Microsoft" },
+  { ticker: "META", change: "+2.1%", up: true, name: "Meta" },
+  { ticker: "TSLA", change: "-2.9%", up: false, name: "Tesla" },
+  { ticker: "AMZN", change: "+0.7%", up: true, name: "Amazon" },
+  { ticker: "GS", change: "-1.1%", up: false, name: "Goldman Sachs" },
+];
+
+const INDICES = [
+  { name: "S&P 500", value: "5,483", change: "+0.74%" },
+  { name: "NASDAQ", value: "17,461", change: "+1.02%" },
+  { name: "DOW", value: "39,118", change: "+0.43%" },
+];
+
+function MarketPulsePanel() {
+  return (
+    <div className="flex flex-col gap-3">
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">Market Pulse</p>
+        <h2 className="font-display mt-0.5 text-lg font-bold leading-tight">Live snapshot — today</h2>
+      </div>
+      {/* Indices */}
+      <div className="grid grid-cols-3 gap-2">
+        {INDICES.map((idx) => (
+          <div key={idx.name} className="rounded-xl border border-border/70 bg-background/60 px-3 py-2">
+            <div className="text-[10px] font-semibold text-muted-foreground">{idx.name}</div>
+            <div className="num mt-0.5 text-sm font-bold">{idx.value}</div>
+            <div className="text-[10px] font-medium text-primary">{idx.change}</div>
+          </div>
+        ))}
+      </div>
+      {/* Movers */}
+      <div>
+        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Top movers</p>
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+          {MARKET_MOVERS.map((m) => (
+            <div
+              key={m.ticker}
+              className={cn(
+                "flex items-center justify-between rounded-xl border px-3 py-2",
+                m.up ? "border-primary/20 bg-primary-soft/30" : "border-destructive/20 bg-destructive/5",
+              )}
+            >
+              <div>
+                <div className="text-[11px] font-bold">{m.ticker}</div>
+                <div className="text-[9px] text-muted-foreground">{m.name}</div>
+              </div>
+              <span className={cn("text-[11px] font-semibold", m.up ? "text-primary" : "text-destructive")}>
+                {m.change}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* AI insight */}
+      <div className="rounded-xl border border-primary/20 bg-primary-soft/20 p-3">
+        <div className="flex items-start gap-2">
+          <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" />
+          <div>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">AI insight</span>
+            <p className="mt-0.5 text-[11px] leading-relaxed text-foreground">
+              Tech is leading today on strong earnings guidance from NVDA. Your portfolio has 28% tech exposure — within your target range.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────── QUICK ACTIONS PANEL (experienced) ─────────────────────── */
+
+const QUICK_ACTIONS = [
+  { icon: Zap, title: "Rebalance portfolio", desc: "AI suggests optimal allocation shift", tag: "Smart" },
+  { icon: BarChart3, title: "Run screener", desc: "Filter stocks by your custom criteria", tag: "Research" },
+  { icon: TrendingUp, title: "Backtest strategy", desc: "Simulate performance on historical data", tag: "Analysis" },
+  { icon: PiggyBank, title: "Tax-loss harvest", desc: "Find offset opportunities before year-end", tag: "Tax" },
+  { icon: Brain, title: "AI portfolio audit", desc: "Identify overlaps, gaps and fees", tag: "AI" },
+  { icon: BookOpen, title: "Earnings calendar", desc: "Upcoming reports for your holdings", tag: "Events" },
+];
+
+function QuickActionsPanel() {
+  return (
+    <div className="flex flex-col gap-3">
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">Quick actions</p>
+        <h2 className="font-display mt-0.5 text-lg font-bold leading-tight">Tools for active investors</h2>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {QUICK_ACTIONS.map((a) => (
+          <button
+            key={a.title}
+            className="group flex items-start gap-3 rounded-xl border border-border/70 bg-background/60 p-3 text-left transition hover:border-primary/40 hover:-translate-y-0.5"
+          >
+            <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+              <a.icon className="size-4" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold leading-tight">{a.title}</span>
+                <span className="rounded-full border border-border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {a.tag}
+                </span>
+              </div>
+              <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{a.desc}</p>
+            </div>
+            <ArrowRight className="size-3.5 shrink-0 self-center text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary" />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -340,7 +539,7 @@ function FeaturesPanel() {
 
 /* ─────────────────────── ASK AI PANEL ─────────────────────── */
 
-const AI_CHIPS = [
+const BEGINNER_CHIPS = [
   "Explain ETFs like I'm 12",
   "What's a safe first portfolio?",
   "Is investing risky right now?",
@@ -349,10 +548,25 @@ const AI_CHIPS = [
   "Difference between stocks and bonds?",
 ];
 
-function AskAiPanel() {
+const EXPERIENCED_CHIPS = [
+  "Analyse my portfolio risk",
+  "Should I rebalance now?",
+  "Best sectors for Q3?",
+  "Compare SCHD vs VYM",
+  "Options strategy for AAPL",
+  "Tax-loss harvest candidates?",
+];
+
+function AskAiPanel({ experienced = false }: { experienced?: boolean }) {
+  const chips = experienced ? EXPERIENCED_CHIPS : BEGINNER_CHIPS;
   const [text, setText] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([
-    { role: "ai", text: "Hi! I'm your AI investing copilot. Ask me anything about investing — no question is too basic." },
+    {
+      role: "ai",
+      text: experienced
+        ? "Hey Alex — I have context on your portfolio. Ask me anything: analysis, comparisons, rebalancing, tax strategy."
+        : "Hi! I'm your AI investing copilot. Ask me anything about investing — no question is too basic.",
+    },
   ]);
 
   const send = () => {
@@ -392,7 +606,7 @@ function AskAiPanel() {
 
       {/* Chips */}
       <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
-        {AI_CHIPS.map((c) => (
+        {chips.map((c) => (
           <button
             key={c}
             onClick={() => setText(c)}
@@ -411,7 +625,7 @@ function AskAiPanel() {
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.nativeEvent.isComposing) { e.preventDefault(); send(); }
           }}
-          placeholder="e.g. What is a dividend stock?"
+          placeholder={experienced ? "e.g. Should I rebalance this month?" : "e.g. What is a dividend stock?"}
           className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
         />
         <button

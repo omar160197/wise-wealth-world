@@ -24,6 +24,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { user } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import { useRole, type Role } from "@/lib/role-context";
 
 const tabs = [
   { to: "/", label: "Home", icon: Home },
@@ -113,13 +114,58 @@ function Logo() {
   );
 }
 
+/* ── Role Toggle ── */
+function RoleToggle({ compact = false }: { compact?: boolean }) {
+  const { role, setRole } = useRole();
+  const options: { value: Role; label: string; short: string }[] = [
+    { value: "beginner", label: "I'm a Beginner", short: "Beginner" },
+    { value: "experienced", label: "I'm Experienced", short: "Experienced" },
+  ];
+
+  return (
+    <div
+      className={cn(
+        "flex rounded-xl border border-border/60 bg-muted/50 p-0.5",
+        compact ? "gap-0" : "gap-0",
+      )}
+      role="group"
+      aria-label="Select your experience level"
+    >
+      {options.map((o) => (
+        <button
+          key={o.value}
+          onClick={() => setRole(o.value)}
+          aria-pressed={role === o.value}
+          className={cn(
+            "flex-1 rounded-[10px] px-2.5 py-1.5 text-[11px] font-semibold transition-all",
+            role === o.value
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {compact ? o.short : o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function DesktopSidebar({ pathname }: { pathname: string }) {
   return (
     <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-border/60 bg-surface px-4 py-5 lg:flex">
-      <Link to="/" className="mb-8 flex items-center gap-2 px-2">
+      <Link to="/" className="mb-6 flex items-center gap-2 px-2">
         <Logo />
         <span className="font-display text-xl font-bold tracking-tight">investwhat</span>
       </Link>
+
+      {/* Role toggle */}
+      <div className="mb-4 px-0">
+        <p className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Your experience
+        </p>
+        <RoleToggle />
+      </div>
+
       <nav className="flex flex-col gap-1">
         {tabs.map((t) => {
           const active = pathname === t.to;
@@ -220,7 +266,14 @@ function HamburgerMenu() {
         </SheetTitle>
       </SheetHeader>
       <div className="flex-1 overflow-y-auto p-3">
-        <div className="px-2 pb-2 pt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {/* Role toggle in hamburger */}
+        <div className="px-2 pb-3 pt-3">
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Your experience
+          </p>
+          <RoleToggle />
+        </div>
+        <div className="px-2 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Discover
         </div>
         <nav className="flex flex-col">

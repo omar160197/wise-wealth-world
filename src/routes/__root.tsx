@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppShell } from "../components/app-shell";
+import { RoleProvider } from "../lib/role-context";
 
 function NotFoundComponent() {
   return (
@@ -117,9 +118,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell>
-        <Outlet />
-      </AppShell>
+      <RoleProvider>
+        <AppShell>
+          <Outlet />
+        </AppShell>
+      </RoleProvider>
     </QueryClientProvider>
   );
 }
