@@ -16,11 +16,10 @@ import {
   BookOpen,
   Zap,
   Loader2,
-  Rocket,
-  X,
   PiggyBank,
   BarChart3,
   Brain,
+  X,
 } from "lucide-react";
 import { AiMeshBackground } from "@/components/home/AiMeshBackground";
 import { cn } from "@/lib/utils";
@@ -41,28 +40,79 @@ export const Route = createFileRoute("/")({
 });
 
 type Track = "new" | "connect" | "build" | null;
-type Tab = "how" | "features" | "ask";
+
+/* ─────────────────────── HOME ─────────────────────── */
 
 function HomePage() {
   const [track, setTrack] = useState<Track>(null);
-  const [tab, setTab] = useState<Tab>("how");
   const [showWelcome, setShowWelcome] = useState(false);
   const { role } = useRole();
 
   return (
-    <div className="flex h-[calc(100svh-56px)] flex-col gap-2 overflow-hidden pb-[env(safe-area-inset-bottom)] lg:h-[calc(100svh-56px-40px)]">
-      {/* Bento grid — fills the viewport */}
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-[1fr_1fr]">
+    <div className="flex h-[calc(100svh-56px)] flex-col gap-0 overflow-hidden pb-[env(safe-area-inset-bottom)] lg:h-[calc(100svh-56px-40px)]">
 
-        {/* ── LEFT COLUMN ── */}
-        <div className="relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/80 p-4 shadow-soft backdrop-blur-md sm:p-5">
-          <AiMeshBackground className="rounded-2xl" />
+      {/* ── Top header bar: full width, unified ── */}
+      <div className="relative shrink-0 overflow-hidden rounded-t-2xl border border-border/60 bg-card/80 px-5 py-4 backdrop-blur-md">
+        <AiMeshBackground className="rounded-t-2xl" />
+        <div className="relative z-10 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            {role === "experienced" ? (
+              <>
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary-soft/70 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-foreground">
+                  <BarChart3 className="size-3" /> Pro dashboard
+                </div>
+                <h1 className="font-display mt-1 text-xl font-bold leading-tight sm:text-2xl">
+                  Welcome back, <span className="text-primary">Alex.</span>{" "}
+                  <span className="text-base font-normal text-muted-foreground">
+                    Portfolio up <span className="font-semibold text-primary">+2.4%</span> this week.
+                  </span>
+                </h1>
+              </>
+            ) : (
+              <>
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary-soft/70 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-foreground">
+                  <Sparkles className="size-3" /> AI copilot for investors
+                </div>
+                <h1 className="font-display mt-1 text-xl font-bold leading-tight sm:text-2xl">
+                  Your money, finally{" "}
+                  <span className="text-primary">working for you.</span>
+                </h1>
+              </>
+            )}
+          </div>
+          {/* Trust / stats row — inline on desktop */}
+          <div className="flex items-center gap-4">
+            {role === "experienced" ? (
+              <>
+                <StatChip value="$22,700" label="Total" />
+                <StatChip value="+$542" label="7d P&L" up />
+                <StatChip value="1.42" label="Sharpe" />
+              </>
+            ) : (
+              <>
+                <StatChip value="50k+" label="investors" />
+                <StatChip value="$2.4B+" label="analyzed" />
+                <StatChip value="Free" label="to start" up />
+              </>
+            )}
+          </div>
+        </div>
+      </div>
 
+      {/* ── Bento grid — fills remaining height ── */}
+      <div className={cn(
+        "min-h-0 flex-1 grid gap-[1px] bg-border/40 rounded-b-2xl overflow-hidden",
+        role === "experienced"
+          ? "grid-cols-1 grid-rows-[1fr_auto] lg:grid-cols-[1.1fr_0.9fr] lg:grid-rows-1"
+          : "grid-cols-1 grid-rows-[1fr_auto] lg:grid-cols-[1fr_1fr] lg:grid-rows-1",
+      )}>
+
+        {/* ── CELL A: main action area ── */}
+        <div className="relative flex min-h-0 flex-col overflow-hidden bg-card/90 p-4 backdrop-blur-md sm:p-5">
           {role === "experienced" ? (
-            <ExperiencedLeftPanel />
+            <ExperiencedMainCell />
           ) : track !== null ? (
-            /* Track panel overlays the left column */
-            <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               <button
                 onClick={() => setTrack(null)}
                 className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-border/60 bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
@@ -74,127 +124,24 @@ function HomePage() {
               {track === "build" && <BuildTrack onFinish={() => { setTrack(null); setShowWelcome(true); }} />}
             </div>
           ) : (
-            <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-between gap-3">
-              {/* Headline */}
-              <div>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary-soft/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent-foreground backdrop-blur-sm">
-                  <Sparkles className="size-3" /> AI copilot for investors
-                </span>
-                <h1 className="font-display mt-2.5 text-balance text-2xl font-bold leading-[1.1] tracking-tight sm:text-3xl lg:text-[28px] xl:text-[32px]">
-                  Your money, finally{" "}
-                  <span className="text-primary">working for you.</span>
-                </h1>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                  No experience needed. Pick where you&apos;d like to start and let AI handle the rest.
-                </p>
-              </div>
-
-              {/* CTA tiles */}
-              <div className="flex flex-col gap-2">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Where do you want to start?
-                </p>
-                <StartTile
-                  icon={Compass}
-                  title="I'm brand new to investing"
-                  desc="2 quick questions → starter portfolio"
-                  onClick={() => setTrack("new")}
-                />
-                <StartTile
-                  icon={Link2}
-                  title="I already have accounts"
-                  desc="Connect your bank or broker — read-only"
-                  onClick={() => setTrack("connect")}
-                />
-                <StartTile
-                  icon={Wand2}
-                  title="Build with AI"
-                  desc="One sentence → tailored portfolio in seconds"
-                  featured
-                  onClick={() => setTrack("build")}
-                />
-              </div>
-
-              {/* Trust row */}
-              <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border/50 pt-2.5">
-                {[
-                  { icon: ShieldCheck, text: "256-bit encrypted" },
-                  { icon: Check, text: "Read-only connections" },
-                  { icon: Sparkles, text: "No ads or data selling" },
-                ].map((t) => (
-                  <span key={t.text} className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <t.icon className="size-3 text-primary" /> {t.text}
-                  </span>
-                ))}
-              </div>
-            </div>
+            <BeginnerMainCell onSelect={setTrack} />
           )}
         </div>
 
-        {/* ── RIGHT COLUMN: tabbed info panel ── */}
-        <div className="flex min-h-0 flex-col rounded-2xl border border-border/70 bg-card/80 shadow-soft backdrop-blur-md">
-          {/* Tab bar */}
-          <div className="flex shrink-0 gap-1 border-b border-border/60 px-3 pt-2.5">
-            {(
-              role === "experienced"
-                ? [
-                    { id: "how", label: "Market Pulse" },
-                    { id: "features", label: "Quick Actions" },
-                    { id: "ask", label: "Ask AI" },
-                  ]
-                : [
-                    { id: "how", label: "How it works" },
-                    { id: "features", label: "Features" },
-                    { id: "ask", label: "Ask AI" },
-                  ]
-            ).map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id as Tab)}
-                className={cn(
-                  "rounded-t-xl px-3.5 py-2 text-xs font-semibold transition",
-                  tab === t.id
-                    ? "border border-b-0 border-border/60 bg-background text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Tab content */}
-          <div className="min-h-0 flex-1 overflow-y-auto p-4">
-            {role === "experienced" ? (
-              <>
-                {tab === "how" && <MarketPulsePanel />}
-                {tab === "features" && <QuickActionsPanel />}
-                {tab === "ask" && <AskAiPanel experienced />}
-              </>
-            ) : (
-              <>
-                {tab === "how" && <HowItWorksPanel />}
-                {tab === "features" && <FeaturesPanel />}
-                {tab === "ask" && <AskAiPanel />}
-              </>
-            )}
-          </div>
+        {/* ── CELL B: secondary panel ── */}
+        <div className={cn(
+          "min-h-0 overflow-hidden bg-card/70 backdrop-blur-md",
+          role === "experienced"
+            ? "grid grid-rows-[auto_1fr] lg:flex lg:flex-col"
+            : "flex flex-col",
+        )}>
+          {role === "experienced" ? (
+            <ExperiencedSecondaryCell />
+          ) : (
+            <BeginnerSecondaryCell />
+          )}
         </div>
-      </div>
 
-      {/* Stat strip — pinned at bottom, very compact */}
-      <div className="hidden shrink-0 items-center justify-center gap-6 rounded-xl border border-border/50 bg-card/60 px-4 py-1.5 sm:flex">
-        {[
-          { value: "50,000+", label: "people growing wealth" },
-          { value: "$2.4B+", label: "portfolios analyzed" },
-          { value: "AI-first", label: "built for beginners" },
-          { value: "Free", label: "to get started" },
-        ].map((s) => (
-          <div key={s.label} className="flex items-baseline gap-1">
-            <span className="num text-sm font-bold text-foreground">{s.value}</span>
-            <span className="text-[11px] text-muted-foreground">{s.label}</span>
-          </div>
-        ))}
       </div>
 
       {showWelcome && <WelcomeInterstitial onClose={() => setShowWelcome(false)} />}
@@ -202,7 +149,113 @@ function HomePage() {
   );
 }
 
-/* ─────────────────────── EXPERIENCED LEFT PANEL ─────────────────────── */
+/* ─────────────────────── STAT CHIP ─────────────────────── */
+
+function StatChip({ value, label, up }: { value: string; label: string; up?: boolean }) {
+  return (
+    <div className="text-right">
+      <div className={cn("text-sm font-bold leading-tight", up && "text-primary")}>{value}</div>
+      <div className="text-[10px] text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+/* ─────────────────────── BEGINNER MAIN CELL ─────────────────────── */
+
+function BeginnerMainCell({ onSelect }: { onSelect: (t: Track) => void }) {
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
+      {/* AI chat preview */}
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <AiChatPreview />
+      </div>
+
+      {/* Start paths */}
+      <div className="shrink-0">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Choose your starting point
+        </p>
+        <div className="flex flex-col gap-1.5">
+          <StartTile icon={Compass} title="Brand new to investing" desc="2 questions → starter portfolio" onClick={() => onSelect("new")} />
+          <StartTile icon={Link2} title="I already have accounts" desc="Connect bank or broker — read-only" onClick={() => onSelect("connect")} />
+          <StartTile icon={Wand2} title="Build with AI" desc="One sentence → tailored portfolio" featured onClick={() => onSelect("build")} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────── BEGINNER SECONDARY CELL ─────────────────────── */
+
+const HOW_STEPS = [
+  { num: "01", icon: Compass, title: "Tell us where you are", body: "Two quick questions — no finance degree needed." },
+  { num: "02", icon: Brain, title: "AI builds your plan", body: "A personalised portfolio crafted in seconds." },
+  { num: "03", icon: BarChart3, title: "Track and grow", body: "The AI monitors and explains — you stay in control." },
+];
+
+function BeginnerSecondaryCell() {
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-0 divide-y divide-border/50">
+      {/* How it works — compact horizontal steps */}
+      <div className="shrink-0 p-4">
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-primary">How it works</p>
+        <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+          {HOW_STEPS.map((s) => (
+            <div key={s.num} className="flex items-start gap-3 flex-1">
+              <span className="grid size-7 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-glow">
+                <s.icon className="size-3.5" />
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-[10px] font-bold leading-snug">{s.title}</span>
+                  <span className="font-display text-base font-bold text-muted-foreground/20 select-none leading-none">{s.num}</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug">{s.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Trust signals */}
+      <div className="shrink-0 flex flex-wrap gap-x-4 gap-y-1.5 p-4">
+        {[
+          { icon: ShieldCheck, text: "256-bit encrypted" },
+          { icon: Check, text: "Read-only connections" },
+          { icon: Sparkles, text: "No ads or data selling" },
+        ].map((t) => (
+          <span key={t.text} className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+            <t.icon className="size-3 text-primary" /> {t.text}
+          </span>
+        ))}
+      </div>
+
+      {/* Features mini-grid */}
+      <div className="min-h-0 flex-1 overflow-y-auto p-4">
+        <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">What you get</p>
+        <div className="grid grid-cols-2 gap-1.5 lg:grid-cols-3">
+          {[
+            { icon: Brain, title: "AI explains it all" },
+            { icon: ShieldCheck, title: "Read-only, secure" },
+            { icon: PiggyBank, title: "Goal saving" },
+            { icon: TrendingUp, title: "Fantasy mode" },
+            { icon: Zap, title: "Market signals" },
+            { icon: BookOpen, title: "Bite-sized lessons" },
+          ].map((f) => (
+            <div key={f.title} className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/60 px-2.5 py-2">
+              <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
+                <f.icon className="size-3" />
+              </span>
+              <span className="text-[11px] font-semibold leading-tight">{f.title}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────── EXPERIENCED MAIN CELL ─────────────────────── */
 
 const PORTFOLIO_ROWS = [
   { ticker: "VOO", name: "Vanguard S&P 500", value: "$12,480", change: "+1.24%", up: true },
@@ -211,41 +264,28 @@ const PORTFOLIO_ROWS = [
   { ticker: "AGG", name: "US Bond ETF", value: "$2,800", change: "+0.06%", up: true },
 ];
 
-function ExperiencedLeftPanel() {
+function ExperiencedMainCell() {
   return (
-    <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
-      {/* Header */}
-      <div>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary-soft/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent-foreground">
-          <BarChart3 className="size-3" /> Pro dashboard
-        </span>
-        <h1 className="font-display mt-2 text-balance text-2xl font-bold leading-[1.1] tracking-tight">
-          Welcome back, <span className="text-primary">Alex.</span>
-        </h1>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Your portfolio is up <span className="font-semibold text-primary">+2.4%</span> this week. Markets are open.
-        </p>
-      </div>
-
-      {/* Portfolio snapshot */}
-      <div className="rounded-xl border border-border/70 bg-background/60">
-        <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      {/* Portfolio table */}
+      <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-border/60 bg-background/60">
+        <div className="sticky top-0 flex items-center justify-between border-b border-border/50 bg-background/90 px-3 py-2 backdrop-blur-sm">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Holdings</span>
           <span className="text-[10px] font-semibold text-primary">$22,700 total</span>
         </div>
         <div className="divide-y divide-border/40">
           {PORTFOLIO_ROWS.map((r) => (
-            <div key={r.ticker} className="flex items-center gap-3 px-3 py-2">
-              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-muted text-[10px] font-bold">
+            <div key={r.ticker} className="flex items-center gap-3 px-3 py-2.5">
+              <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-muted text-[11px] font-bold">
                 {r.ticker.slice(0, 2)}
               </span>
               <div className="min-w-0 flex-1">
-                <div className="text-[11px] font-semibold leading-tight">{r.ticker}</div>
+                <div className="text-[12px] font-semibold">{r.ticker}</div>
                 <div className="truncate text-[10px] text-muted-foreground">{r.name}</div>
               </div>
               <div className="text-right">
-                <div className="text-[11px] font-semibold">{r.value}</div>
-                <div className={cn("text-[10px] font-medium", r.up ? "text-primary" : "text-destructive")}>
+                <div className="text-[12px] font-semibold">{r.value}</div>
+                <div className={cn("text-[10px] font-semibold", r.up ? "text-primary" : "text-destructive")}>
                   {r.change}
                 </div>
               </div>
@@ -254,26 +294,28 @@ function ExperiencedLeftPanel() {
         </div>
       </div>
 
-      {/* Mini stat row */}
-      <div className="grid grid-cols-3 gap-2">
-        <MiniStat label="7-day P&L" value="+$542" />
+      {/* Stats row */}
+      <div className="grid shrink-0 grid-cols-3 gap-2">
+        <MiniStat label="7-day P&L" value="+$542" accent />
         <MiniStat label="Sharpe ratio" value="1.42" />
         <MiniStat label="Risk score" value="6/10" />
+      </div>
+
+      {/* AI portfolio insight */}
+      <div className="shrink-0 flex items-start gap-2.5 rounded-xl border border-primary/20 bg-primary-soft/20 p-3">
+        <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" />
+        <div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">AI insight</span>
+          <p className="mt-0.5 text-[11px] leading-relaxed text-foreground">
+            Tech is leading today on NVDA earnings. Your 28% tech exposure is within target — no rebalance needed yet.
+          </p>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ─────────────────────── MARKET PULSE PANEL (experienced) ─────────────────────── */
-
-const MARKET_MOVERS = [
-  { ticker: "NVDA", change: "+4.8%", up: true, name: "NVIDIA" },
-  { ticker: "MSFT", change: "+1.2%", up: true, name: "Microsoft" },
-  { ticker: "META", change: "+2.1%", up: true, name: "Meta" },
-  { ticker: "TSLA", change: "-2.9%", up: false, name: "Tesla" },
-  { ticker: "AMZN", change: "+0.7%", up: true, name: "Amazon" },
-  { ticker: "GS", change: "-1.1%", up: false, name: "Goldman Sachs" },
-];
+/* ─────────────────────── EXPERIENCED SECONDARY CELL ─────────────────────── */
 
 const INDICES = [
   { name: "S&P 500", value: "5,483", change: "+0.74%" },
@@ -281,101 +323,188 @@ const INDICES = [
   { name: "DOW", value: "39,118", change: "+0.43%" },
 ];
 
-function MarketPulsePanel() {
+const MARKET_MOVERS = [
+  { ticker: "NVDA", change: "+4.8%", up: true, name: "NVIDIA" },
+  { ticker: "MSFT", change: "+1.2%", up: true, name: "Microsoft" },
+  { ticker: "TSLA", change: "-2.9%", up: false, name: "Tesla" },
+  { ticker: "META", change: "+2.1%", up: true, name: "Meta" },
+];
+
+const QUICK_ACTIONS = [
+  { icon: Zap, title: "Rebalance", desc: "AI-suggested shift" },
+  { icon: BarChart3, title: "Screener", desc: "Filter by criteria" },
+  { icon: TrendingUp, title: "Backtest", desc: "Historical sim" },
+  { icon: PiggyBank, title: "Tax harvest", desc: "Year-end offsets" },
+];
+
+function ExperiencedSecondaryCell() {
+  const [activeTab, setActiveTab] = useState<"market" | "actions">("market");
+
   return (
-    <div className="flex flex-col gap-3">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">Market Pulse</p>
-        <h2 className="font-display mt-0.5 text-lg font-bold leading-tight">Live snapshot — today</h2>
-      </div>
-      {/* Indices */}
-      <div className="grid grid-cols-3 gap-2">
-        {INDICES.map((idx) => (
-          <div key={idx.name} className="rounded-xl border border-border/70 bg-background/60 px-3 py-2">
-            <div className="text-[10px] font-semibold text-muted-foreground">{idx.name}</div>
-            <div className="num mt-0.5 text-sm font-bold">{idx.value}</div>
-            <div className="text-[10px] font-medium text-primary">{idx.change}</div>
-          </div>
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* Tab strip */}
+      <div className="flex shrink-0 gap-0 border-b border-border/50">
+        {(["market", "actions"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setActiveTab(t)}
+            className={cn(
+              "flex-1 py-2.5 text-[11px] font-semibold transition",
+              activeTab === t
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {t === "market" ? "Market Pulse" : "Quick Actions"}
+          </button>
         ))}
       </div>
-      {/* Movers */}
-      <div>
-        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Top movers</p>
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-          {MARKET_MOVERS.map((m) => (
-            <div
-              key={m.ticker}
-              className={cn(
-                "flex items-center justify-between rounded-xl border px-3 py-2",
-                m.up ? "border-primary/20 bg-primary-soft/30" : "border-destructive/20 bg-destructive/5",
-              )}
-            >
-              <div>
-                <div className="text-[11px] font-bold">{m.ticker}</div>
-                <div className="text-[9px] text-muted-foreground">{m.name}</div>
+
+      {activeTab === "market" ? (
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+          {/* Indices */}
+          <div className="grid grid-cols-3 gap-1.5">
+            {INDICES.map((idx) => (
+              <div key={idx.name} className="rounded-xl border border-border/60 bg-background/60 px-2.5 py-2">
+                <div className="text-[10px] font-medium text-muted-foreground">{idx.name}</div>
+                <div className="mt-0.5 text-sm font-bold leading-none">{idx.value}</div>
+                <div className="mt-0.5 text-[10px] font-semibold text-primary">{idx.change}</div>
               </div>
-              <span className={cn("text-[11px] font-semibold", m.up ? "text-primary" : "text-destructive")}>
-                {m.change}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-      {/* AI insight */}
-      <div className="rounded-xl border border-primary/20 bg-primary-soft/20 p-3">
-        <div className="flex items-start gap-2">
-          <Sparkles className="mt-0.5 size-3.5 shrink-0 text-primary" />
+            ))}
+          </div>
+          {/* Movers */}
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">AI insight</span>
-            <p className="mt-0.5 text-[11px] leading-relaxed text-foreground">
-              Tech is leading today on strong earnings guidance from NVDA. Your portfolio has 28% tech exposure — within your target range.
-            </p>
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Top movers</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {MARKET_MOVERS.map((m) => (
+                <div
+                  key={m.ticker}
+                  className={cn(
+                    "flex items-center justify-between rounded-xl border px-3 py-2",
+                    m.up ? "border-primary/20 bg-primary-soft/30" : "border-destructive/20 bg-destructive/5",
+                  )}
+                >
+                  <div>
+                    <div className="text-[12px] font-bold">{m.ticker}</div>
+                    <div className="text-[9px] text-muted-foreground">{m.name}</div>
+                  </div>
+                  <span className={cn("text-[11px] font-bold", m.up ? "text-primary" : "text-destructive")}>
+                    {m.change}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-2 content-start">
+          {QUICK_ACTIONS.map((a) => (
+            <button
+              key={a.title}
+              className="group flex flex-col gap-2 rounded-xl border border-border/60 bg-background/60 p-3 text-left transition hover:border-primary/40 hover:-translate-y-0.5"
+            >
+              <span className="grid size-8 place-items-center rounded-xl bg-primary-soft text-primary">
+                <a.icon className="size-4" />
+              </span>
+              <div>
+                <div className="text-xs font-bold">{a.title}</div>
+                <div className="text-[11px] text-muted-foreground">{a.desc}</div>
+              </div>
+              <ArrowRight className="size-3 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary" />
+            </button>
+          ))}
+          {/* AI audit full-width */}
+          <button className="group col-span-2 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary-soft/20 px-4 py-3 text-left transition hover:border-primary/40">
+            <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
+              <Brain className="size-4" />
+            </span>
+            <div className="flex-1">
+              <div className="text-xs font-bold">AI portfolio audit</div>
+              <div className="text-[11px] text-muted-foreground">Identify overlaps, gaps and hidden fees</div>
+            </div>
+            <ArrowRight className="size-3.5 shrink-0 text-primary transition group-hover:translate-x-0.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-/* ─────────────────────── QUICK ACTIONS PANEL (experienced) ─────────────────────── */
+/* ─────────────────────── AI CHAT PREVIEW (beginner) ─────────────────────── */
 
-const QUICK_ACTIONS = [
-  { icon: Zap, title: "Rebalance portfolio", desc: "AI suggests optimal allocation shift", tag: "Smart" },
-  { icon: BarChart3, title: "Run screener", desc: "Filter stocks by your custom criteria", tag: "Research" },
-  { icon: TrendingUp, title: "Backtest strategy", desc: "Simulate performance on historical data", tag: "Analysis" },
-  { icon: PiggyBank, title: "Tax-loss harvest", desc: "Find offset opportunities before year-end", tag: "Tax" },
-  { icon: Brain, title: "AI portfolio audit", desc: "Identify overlaps, gaps and fees", tag: "AI" },
-  { icon: BookOpen, title: "Earnings calendar", desc: "Upcoming reports for your holdings", tag: "Events" },
+const BEGINNER_CHIPS = [
+  "Explain ETFs like I'm 12",
+  "What's a safe first portfolio?",
+  "How do I start with $100?",
+  "Is investing risky right now?",
 ];
 
-function QuickActionsPanel() {
+function AiChatPreview() {
+  const [text, setText] = useState("");
+  const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([
+    { role: "ai", text: "Hi! I'm your AI investing copilot. No question is too basic — ask me anything." },
+  ]);
+
+  const send = () => {
+    const t = text.trim();
+    if (!t) return;
+    setMessages((m) => [
+      ...m,
+      { role: "user", text: t },
+      { role: "ai", text: "Great question! Once connected to the AI backend, I'll give you a real answer grounded in your data." },
+    ]);
+    setText("");
+  };
+
   return (
-    <div className="flex flex-col gap-3">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">Quick actions</p>
-        <h2 className="font-display mt-0.5 text-lg font-bold leading-tight">Tools for active investors</h2>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-2">
-        {QUICK_ACTIONS.map((a) => (
-          <button
-            key={a.title}
-            className="group flex items-start gap-3 rounded-xl border border-border/70 bg-background/60 p-3 text-left transition hover:border-primary/40 hover:-translate-y-0.5"
+    <div className="flex h-full flex-col gap-2">
+      {/* Messages */}
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto rounded-xl border border-border/60 bg-background/60 p-3">
+        {messages.map((m, i) => (
+          <div
+            key={i}
+            className={cn(
+              "max-w-[88%] rounded-xl px-3 py-2 text-xs leading-relaxed",
+              m.role === "user"
+                ? "ml-auto bg-primary text-primary-foreground"
+                : "bg-muted text-foreground",
+            )}
           >
-            <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
-              <a.icon className="size-4" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold leading-tight">{a.title}</span>
-                <span className="rounded-full border border-border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {a.tag}
-                </span>
-              </div>
-              <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{a.desc}</p>
-            </div>
-            <ArrowRight className="size-3.5 shrink-0 self-center text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary" />
+            {m.text}
+          </div>
+        ))}
+      </div>
+      {/* Chips */}
+      <div className="no-scrollbar flex gap-1.5 overflow-x-auto shrink-0">
+        {BEGINNER_CHIPS.map((c) => (
+          <button
+            key={c}
+            onClick={() => setText(c)}
+            className="shrink-0 rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-[10px] font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground transition"
+          >
+            {c}
           </button>
         ))}
+      </div>
+      {/* Input */}
+      <div className="flex shrink-0 items-center gap-2 rounded-xl border border-border bg-background/60 px-3 py-2 focus-within:border-primary/50">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.nativeEvent.isComposing) { e.preventDefault(); send(); }
+          }}
+          placeholder="Ask anything about investing…"
+          className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+        />
+        <button
+          disabled={!text.trim()}
+          onClick={send}
+          aria-label="Send"
+          className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground disabled:opacity-40 transition"
+        >
+          <Send className="size-3.5" />
+        </button>
       </div>
     </div>
   );
@@ -400,244 +529,29 @@ function StartTile({
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex items-center gap-3 rounded-xl border p-3 text-left transition hover:-translate-y-0.5 hover:shadow-glow",
+        "group relative flex items-center gap-3 rounded-xl border p-2.5 text-left transition hover:-translate-y-0.5 hover:shadow-glow",
         featured
           ? "border-primary/40 bg-gradient-to-r from-primary-soft/90 to-card/70 shadow-glow"
           : "border-border/70 bg-background/60 hover:border-primary/40",
       )}
     >
-      <span
-        className={cn(
-          "grid size-9 shrink-0 place-items-center rounded-xl",
-          featured ? "bg-primary text-primary-foreground shadow-glow" : "bg-muted text-foreground",
-        )}
-      >
+      <span className={cn(
+        "grid size-8 shrink-0 place-items-center rounded-xl",
+        featured ? "bg-primary text-primary-foreground shadow-glow" : "bg-muted text-foreground",
+      )}>
         <Icon className="size-4" />
       </span>
       <div className="min-w-0 flex-1">
         <div className="text-xs font-semibold leading-tight">{title}</div>
-        <div className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{desc}</div>
+        <div className="mt-0.5 text-[10px] leading-snug text-muted-foreground">{desc}</div>
       </div>
       {featured && (
-        <span className="absolute right-2.5 top-2 rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary-foreground">
+        <span className="absolute right-2.5 top-1.5 rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary-foreground">
           AI
         </span>
       )}
       <ArrowRight className="size-3.5 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary" />
     </button>
-  );
-}
-
-/* ─────────────────────── HOW IT WORKS PANEL ─────────────────────── */
-
-const HOW_STEPS = [
-  {
-    num: "01",
-    icon: Compass,
-    title: "Tell us where you are",
-    body: "New to investing or already have accounts — just answer two quick questions. No finance degree required.",
-  },
-  {
-    num: "02",
-    icon: Brain,
-    title: "AI builds your plan",
-    body: "Our AI reads your situation, goals, and risk comfort to craft a personalised portfolio in seconds.",
-  },
-  {
-    num: "03",
-    icon: BarChart3,
-    title: "Track and grow",
-    body: "Connect your accounts or start fresh. The AI monitors, explains, and suggests — you stay in control.",
-  },
-];
-
-function HowItWorksPanel() {
-  return (
-    <div className="flex flex-col gap-3">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">How it works</p>
-        <h2 className="font-display mt-0.5 text-lg font-bold leading-tight">From zero to invested in minutes</h2>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          We turned a complicated process into three simple steps — no experience needed.
-        </p>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-3">
-        {HOW_STEPS.map((s) => (
-          <div key={s.num} className="flex flex-col gap-2 rounded-xl border border-border/70 bg-background/60 p-3">
-            <div className="flex items-center justify-between">
-              <span className="grid size-8 place-items-center rounded-xl bg-primary text-primary-foreground shadow-glow">
-                <s.icon className="size-4" />
-              </span>
-              <span className="font-display text-2xl font-bold text-muted-foreground/30 select-none">{s.num}</span>
-            </div>
-            <div className="font-display text-xs font-bold leading-snug">{s.title}</div>
-            <p className="text-[11px] leading-relaxed text-muted-foreground">{s.body}</p>
-          </div>
-        ))}
-      </div>
-      {/* Compact FAQ */}
-      <div className="mt-1 rounded-xl border border-border/60 bg-background/50 p-3">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Quick answers</p>
-        <div className="flex flex-col gap-1.5">
-          {[
-            { q: "What is a stock?", a: "A tiny slice of ownership in a real company." },
-            { q: "What's an ETF?", a: "A basket of many stocks — built-in diversification." },
-            { q: "Is investing gambling?", a: "No. It's ownership in businesses that grow over time." },
-            { q: "How much to start?", a: "As little as $1 with fractional shares." },
-          ].map((item) => (
-            <div key={item.q} className="grid grid-cols-[auto_1fr] gap-x-2 text-[11px]">
-              <span className="font-semibold text-foreground">{item.q}</span>
-              <span className="text-muted-foreground">{item.a}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────── FEATURES PANEL ─────────────────────── */
-
-const FEATURES = [
-  { icon: Brain, title: "AI explains everything", tag: "Core", body: "Ask any question — get plain-English answers grounded in your actual data." },
-  { icon: ShieldCheck, title: "Read-only, always secure", tag: "Security", body: "We connect in read-only mode. We never see your password or move your money." },
-  { icon: PiggyBank, title: "Goal-based saving", tag: "Planning", body: "Set a goal — house, retirement — and the AI tells you how much to save monthly." },
-  { icon: TrendingUp, title: "Fantasy portfolio mode", tag: "Learning", body: "Test any idea risk-free with virtual money. Build confidence before committing." },
-  { icon: Zap, title: "Real-time market signals", tag: "Markets", body: "Live prices and news filtered to your portfolio — only what matters to you." },
-  { icon: BookOpen, title: "Bite-sized lessons", tag: "Education", body: "Short, jargon-free articles written by AI based on what you're looking at." },
-];
-
-function FeaturesPanel() {
-  return (
-    <div className="flex flex-col gap-3">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">What you get</p>
-        <h2 className="font-display mt-0.5 text-lg font-bold leading-tight">Everything you need, nothing you don&apos;t</h2>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((f) => (
-          <div
-            key={f.title}
-            className="flex flex-col gap-2 rounded-xl border border-border/70 bg-background/60 p-3 transition hover:border-primary/30"
-          >
-            <div className="flex items-center justify-between">
-              <span className="grid size-8 place-items-center rounded-xl bg-primary-soft text-primary">
-                <f.icon className="size-4" />
-              </span>
-              <span className="rounded-full border border-border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {f.tag}
-              </span>
-            </div>
-            <div className="font-display text-xs font-bold leading-snug">{f.title}</div>
-            <p className="text-[11px] leading-relaxed text-muted-foreground">{f.body}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────── ASK AI PANEL ─────────────────────── */
-
-const BEGINNER_CHIPS = [
-  "Explain ETFs like I'm 12",
-  "What's a safe first portfolio?",
-  "Is investing risky right now?",
-  "How do I start with $100?",
-  "What is a dividend stock?",
-  "Difference between stocks and bonds?",
-];
-
-const EXPERIENCED_CHIPS = [
-  "Analyse my portfolio risk",
-  "Should I rebalance now?",
-  "Best sectors for Q3?",
-  "Compare SCHD vs VYM",
-  "Options strategy for AAPL",
-  "Tax-loss harvest candidates?",
-];
-
-function AskAiPanel({ experienced = false }: { experienced?: boolean }) {
-  const chips = experienced ? EXPERIENCED_CHIPS : BEGINNER_CHIPS;
-  const [text, setText] = useState("");
-  const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([
-    {
-      role: "ai",
-      text: experienced
-        ? "Hey Alex — I have context on your portfolio. Ask me anything: analysis, comparisons, rebalancing, tax strategy."
-        : "Hi! I'm your AI investing copilot. Ask me anything about investing — no question is too basic.",
-    },
-  ]);
-
-  const send = () => {
-    const t = text.trim();
-    if (!t) return;
-    setMessages((m) => [
-      ...m,
-      { role: "user", text: t },
-      { role: "ai", text: "Great question! Once connected to the AI backend, I'll give you a real answer grounded in your data. For now, this is a preview of how the conversation will feel." },
-    ]);
-    setText("");
-  };
-
-  return (
-    <div className="flex h-full flex-col gap-2">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">Ask AI</p>
-        <h2 className="font-display mt-0.5 text-lg font-bold leading-tight">No question is too basic</h2>
-      </div>
-
-      {/* Messages */}
-      <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-border/60 bg-background/60 p-3 space-y-2">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={cn(
-              "max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed",
-              m.role === "user"
-                ? "ml-auto bg-primary text-primary-foreground"
-                : "bg-muted text-foreground",
-            )}
-          >
-            {m.text}
-          </div>
-        ))}
-      </div>
-
-      {/* Chips */}
-      <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
-        {chips.map((c) => (
-          <button
-            key={c}
-            onClick={() => setText(c)}
-            className="shrink-0 rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-[10px] font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          >
-            {c}
-          </button>
-        ))}
-      </div>
-
-      {/* Input */}
-      <div className="flex items-center gap-2 rounded-xl border border-border bg-background/60 px-3 py-2 focus-within:border-primary/50">
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.nativeEvent.isComposing) { e.preventDefault(); send(); }
-          }}
-          placeholder={experienced ? "e.g. Should I rebalance this month?" : "e.g. What is a dividend stock?"}
-          className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
-        />
-        <button
-          disabled={!text.trim()}
-          onClick={send}
-          aria-label="Send"
-          className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground disabled:opacity-40"
-        >
-          <Send className="size-3.5" />
-        </button>
-      </div>
-    </div>
   );
 }
 
@@ -653,7 +567,6 @@ function NewInvestorTrack({ onFinish }: { onFinish: () => void }) {
       <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-primary">
         <Compass className="size-3.5" /> New here · step {Math.min(step + 1, 3)} of 3
       </div>
-
       {step === 0 && (
         <QuizStep
           title="When would you like to use this money?"
@@ -663,7 +576,6 @@ function NewInvestorTrack({ onFinish }: { onFinish: () => void }) {
           onSelect={(v) => { setTimeline(v); setStep(1); }}
         />
       )}
-
       {step === 1 && (
         <QuizStep
           title="If your portfolio dropped 20%, you'd…"
@@ -673,7 +585,6 @@ function NewInvestorTrack({ onFinish }: { onFinish: () => void }) {
           onSelect={(v) => { setRisk(v); setStep(2); }}
         />
       )}
-
       {step === 2 && (
         <div className="flex flex-col gap-3">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-[10px] font-semibold text-accent-foreground">
@@ -683,7 +594,7 @@ function NewInvestorTrack({ onFinish }: { onFinish: () => void }) {
             <h3 className="font-display text-base font-bold">A balanced starter portfolio</h3>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               Based on a <b className="text-foreground">{timeline}</b> horizon and your{" "}
-              <b className="text-foreground">{risk?.toLowerCase()}</b> instinct — 60/30/10 mix of index ETFs, dividend stocks, and a growth sleeve.
+              <b className="text-foreground">{risk?.toLowerCase()}</b> instinct.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -922,11 +833,11 @@ function BuildTrack({ onFinish }: { onFinish: () => void }) {
 
 /* ─────────────────────── SHARED ─────────────────────── */
 
-function MiniStat({ label, value }: { label: string; value: string }) {
+function MiniStat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className="rounded-xl border border-border bg-card px-3 py-2">
       <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="num mt-0.5 text-sm font-bold">{value}</div>
+      <div className={cn("num mt-0.5 text-sm font-bold", accent && "text-primary")}>{value}</div>
     </div>
   );
 }
@@ -942,31 +853,32 @@ function WelcomeInterstitial({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-background/70 p-4 backdrop-blur-sm">
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-primary/30 bg-card p-5 shadow-glow">
-        <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 grid size-7 place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground">
+        <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 grid size-7 place-items-center rounded-lg text-muted-foreground hover:bg-muted">
           <X className="size-4" />
         </button>
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent-foreground">
-          <Rocket className="size-3" /> Welcome aboard
+        <div className="mb-1 inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-[10px] font-semibold text-primary">
+          <Sparkles className="size-3" /> You&apos;re all set
         </div>
-        <h2 className="font-display mt-2.5 text-xl font-bold leading-tight">
-          You&apos;re all set. Here&apos;s what&apos;s waiting.
-        </h2>
-        <p className="mt-1 text-xs text-muted-foreground">Explore at your own pace — or ask the AI and it will guide you.</p>
-        <div className="mt-3 grid gap-2">
+        <h2 className="font-display mt-2 text-lg font-bold">Welcome to investwhat</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Here&apos;s what you can do from here:</p>
+        <div className="mt-4 grid gap-3">
           {steps.map((s) => (
-            <div key={s.title} className="flex items-start gap-3 rounded-xl border border-border/70 bg-background/60 p-3">
-              <span className="grid size-8 place-items-center rounded-xl bg-primary text-primary-foreground shadow-glow">
-                <s.icon className="size-3.5" />
+            <div key={s.title} className="flex items-start gap-3 rounded-xl border border-border/60 bg-background/60 p-3">
+              <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+                <s.icon className="size-4" />
               </span>
               <div>
-                <div className="text-xs font-semibold">{s.title}</div>
-                <div className="text-[11px] text-muted-foreground">{s.desc}</div>
+                <div className="text-xs font-bold">{s.title}</div>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">{s.desc}</p>
               </div>
             </div>
           ))}
         </div>
-        <button onClick={onClose} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:opacity-95">
-          Enter my dashboard <ArrowRight className="size-3.5" />
+        <button
+          onClick={onClose}
+          className="mt-4 w-full rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
+        >
+          Explore the app
         </button>
       </div>
     </div>
